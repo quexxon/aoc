@@ -104,5 +104,5 @@
 (module+ main
   (call-with-input-file "input.txt"
     (λ (in)
-      (define lines (filter non-empty-string? (port->lines in)))
-      (time (checksum lines)))))
+      (define boxes (filter non-empty-string? (port->lines in)))
+      (time (checksum boxes)))))

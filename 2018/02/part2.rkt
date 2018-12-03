@@ -2,12 +2,12 @@
 
 #lang racket/base
 
-(require racket/contract/base)
-
 (module+ test
   (require rackunit))
 
 ;;; Provides
+
+(require racket/contract/base)
 
 (provide
  (contract-out
