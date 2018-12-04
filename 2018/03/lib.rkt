@@ -18,6 +18,9 @@
             (string->number height))]
     [_ (error "Invalid format")]))
 
+(define (make-point x y)
+  (+ (* x 1024) y))
+
 (define (record-claim c visited-points-bx overlap-points-bx)
   (define visited-points (unbox visited-points-bx))
   (define overlap-points (unbox overlap-points-bx))
@@ -27,7 +30,7 @@
   (define y-end (+ y-start (claim-height c)))
   (for* ([x (in-range x-start x-end)]
          [y (in-range y-start y-end)])
-    (define point (+ (* x 1024) y))
+    (define point (make-point x y))
     (cond
       [(set-member? visited-points point)
        (set-add! overlap-points point)]
@@ -41,5 +44,5 @@
   (define y-end (+ y-start (claim-height c)))
   (for*/or ([x (in-range x-start x-end)]
             [y (in-range y-start y-end)])
-    (define point (+ (* x 1024) y))
+    (define point (make-point x y))
     (set-member? overlap-points point)))
