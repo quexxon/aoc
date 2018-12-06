@@ -102,7 +102,9 @@
     (check-eq? (checksum boxes) 12)))
 
 (module+ main
-  (call-with-input-file "input.txt"
-    (λ (in)
-      (define boxes (filter non-empty-string? (port->lines in)))
-      (time (checksum boxes)))))
+  (define (process-input in)
+    (time
+     (define boxes (filter non-empty-string? (port->lines in)))
+     (checksum boxes)))
+
+  (call-with-input-file "input.txt" process-input))

@@ -95,9 +95,11 @@
    (find-match '("foo" "bar" "too" "car")) (cons "foo" "too")))
 
 (module+ main
-  (call-with-input-file "input.txt"
-    (λ (in)
-      (define boxes (filter non-empty-string? (port->lines in)))
-      (time (match (find-match boxes)
-              [(cons x y) (shared-chars x y)]
-              [_ (error "No matches found")])))))
+  (define (process-input in)
+    (time
+     (define boxes (filter non-empty-string? (port->lines in)))
+     (match (find-match boxes)
+       [(cons x y) (shared-chars x y)]
+       [_ (error "No matches found")])))
+
+  (call-with-input-file "input.txt" process-input))

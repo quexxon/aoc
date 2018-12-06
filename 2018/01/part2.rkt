@@ -22,7 +22,9 @@
     sum))
 
 (module+ main
-  (time (call-with-input-file "part1.rkt"
-          (λ (in)
-            (define numbers (numbers-from-file in))
-            (find-repeated-sum numbers)))))
+  (define (process-input in)
+    (time
+     (define numbers (numbers-from-file in))
+     (find-repeated-sum numbers)))
+
+  (call-with-input-file "part1.rkt" process-input))
