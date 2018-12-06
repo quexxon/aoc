@@ -8,14 +8,17 @@
          racket/vector
          "lib.rkt")
 
+(define (most-freq-minute grd)
+  (vector-argmax identity (guard-mins grd)))
+
 (define (process-input in)
   (time
    (define guards (make-hasheq))
    (define entries (sort (port->lines in) string<?))
    (record-log-entries entries (box guards))
-   (define sleepiest (argmax guard-total (hash-values guards)))
-   (define minutes (guard-mins sleepiest))
-   (* (guard-id sleepiest)
+   (define grd (argmax most-freq-minute (hash-values guards)))
+   (define minutes (guard-mins grd))
+   (* (guard-id grd)
       (vector-member (vector-argmax identity minutes) minutes))))
 
 (call-with-input-file "input.txt" process-input)
