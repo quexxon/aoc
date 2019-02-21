@@ -1,7 +1,6 @@
 use fnv::FnvHashSet;
 use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
+use std::io::{prelude::*, BufReader};
 use std::time::Instant;
 
 const INPUT_FILE: &str = "input.txt";
