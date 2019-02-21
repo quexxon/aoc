@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use fnv::FnvHashSet;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -25,7 +25,7 @@ fn part_two() -> Option<i32> {
         .collect();
 
     let mut prev_sum = 0;
-    let mut prev_sums: HashSet<i32> = HashSet::new();
+    let mut prev_sums = FnvHashSet::default();
 
     for n in nums.iter().cycle() {
         let sum = prev_sum + n;
