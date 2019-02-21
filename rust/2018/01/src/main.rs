@@ -42,7 +42,7 @@ fn part_two() -> Option<i32> {
 
 fn time<F>(fun: F)
 where
-    F: Fn() -> (),
+    F: FnOnce() -> (),
 {
     let now = Instant::now();
     fun();
