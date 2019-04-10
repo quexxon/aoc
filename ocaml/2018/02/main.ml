@@ -15,20 +15,26 @@ let box_value box =
   let counts = Hashtbl.data counts in
   ( has_count 2 counts, has_count 3 counts )
 
-let eql_but_one s1 s2 =
-  let char_lists = List.zip_exn s1 s2 in
-  List.fold_until char_lists ~init:0 ~finish:((=) 1) ~f:(fun diff (x,y) ->
-      if Char.(x <> y) then
-        if diff = 1 then
-          Stop false
-        else
-          Continue (diff + 1)
-      else
-        Continue diff
-    )
+let string_zip_exn s1 s2 =
+  let n = String.length s1 in
+  let rec loop i ac =
+    if i < 0 then ac else loop (i - 1) ((s1.[i], s2.[i]) :: ac)
+  in
+  loop (n - 1) []
+
+let one_char_diff_exn s1 s2 =
+  let n = String.length s1 in
+  let rec loop i diff_chars =
+    if i = n then diff_chars = 1
+    else if Char.(s1.[i] <> s2.[i]) then
+      if diff_chars = 1 then false else loop (i + 1) (diff_chars + 1)
+    else
+      loop (i + 1) diff_chars
+  in
+  loop 0 0
 
 let keep_shared_chars s1 s2 =
-  let char_lists = List.zip_exn s1 s2 in
+  let char_lists = string_zip_exn s1 s2 in
   List.fold_right char_lists ~init:[] ~f:(fun (x,y) acc ->
       if Char.(x = y) then x :: acc else acc
     )
@@ -38,34 +44,32 @@ let keep_shared_chars s1 s2 =
 (* -- AOC 2018 DAY 2 -------------------------------------------------------- *)
 
 
-let part_one input =
-  let box_sum (x,y) (x',y') = (x + x', y + y') in
-  List.fold input ~init:(0,0) ~f:(fun acc box -> box_sum acc (box_value box))
+let part_one boxes =
+  let sum (x,y) (x',y') = (x + x', y + y') in
+  List.fold boxes ~init:(0,0) ~f:(fun ac box -> sum ac (box_value box))
   |> (fun (twos, threes) -> twos * threes)
 
-let part_two input =
-  let input = List.map ~f:String.to_list input in
-  List.fold_until input ~init:(List.tl input) ~finish:(Fn.const "")
-    ~f:(fun tl_opt hd ->
-      match tl_opt with
-      | None -> Continue None
-      | Some tl ->
-         match List.find tl ~f:(eql_but_one hd) with
-         | None -> Continue (List.tl tl)
-         | Some x -> Stop (keep_shared_chars hd x)
-    )
+let part_two boxes ~default =
+  let rec loop = function
+    | [] -> default
+    | box :: boxes ->
+      match List.find boxes ~f:(one_char_diff_exn box) with
+      | None -> loop boxes
+      | Some box' -> keep_shared_chars box box'
+  in
+  loop boxes
 
 let () =
   In_channel.with_file "input.txt" ~f:(fun inc ->
       let lines = In_channel.input_lines inc in
+      let do_part_one () = part_one lines in
+      let do_part_two () = part_two lines ~default:"" in
       print_endline "RESULTS:";
-      printf "Part 1: %d\n" (part_one lines);
-      printf "Part 2: %s\n" (part_two lines);
+      printf "Part 1: %d\n" (do_part_one ());
+      printf "Part 2: %s\n" (do_part_two ());
       print_endline "\nBENCHMARKS:";
-      [ Bench.Test.create ~name:"Part 1"
-          (fun () -> part_one lines);
-        Bench.Test.create ~name:"Part 2"
-          (fun () -> part_two lines);
+      [ Bench.Test.create ~name:"Part 1" do_part_one;
+        Bench.Test.create ~name:"Part 2" do_part_two;
       ]
       |> Bench.make_command
       |> Command.run
