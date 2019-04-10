@@ -23,14 +23,14 @@ let part_two ints =
 let () =
   In_channel.with_file "input.txt" ~f:(fun inc ->
       let ints = List.map ~f:Int.of_string (In_channel.input_lines inc) in
+      let exec_part_one () = part_one ints in
+      let exec_part_two () = part_two ints in
       print_endline "RESULTS:";
-      printf "Part 1: %d\n" (part_one ints);
-      printf "Part 2: %d\n" (part_two ints);
+      printf "Part 1: %d\n" (exec_part_one ());
+      printf "Part 2: %d\n" (exec_part_two ());
       print_endline "\nBENCHMARKS:";
-      [ Bench.Test.create ~name:"Part 1"
-          (fun () -> part_one ints);
-        Bench.Test.create ~name:"Part 2"
-          (fun () -> part_two ints);
+      [ Bench.Test.create ~name:"Part 1" exec_part_one;
+        Bench.Test.create ~name:"Part 2" exec_part_two;
       ]
       |> Bench.make_command
       |> Command.run

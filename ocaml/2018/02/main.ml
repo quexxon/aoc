@@ -62,14 +62,14 @@ let part_two boxes ~default =
 let () =
   In_channel.with_file "input.txt" ~f:(fun inc ->
       let lines = In_channel.input_lines inc in
-      let do_part_one () = part_one lines in
-      let do_part_two () = part_two lines ~default:"" in
+      let exec_part_one () = part_one lines in
+      let exec_part_two () = part_two lines ~default:"" in
       print_endline "RESULTS:";
-      printf "Part 1: %d\n" (do_part_one ());
-      printf "Part 2: %s\n" (do_part_two ());
+      printf "Part 1: %d\n" (exec_part_one ());
+      printf "Part 2: %s\n" (exec_part_two ());
       print_endline "\nBENCHMARKS:";
-      [ Bench.Test.create ~name:"Part 1" do_part_one;
-        Bench.Test.create ~name:"Part 2" do_part_two;
+      [ Bench.Test.create ~name:"Part 1" exec_part_one;
+        Bench.Test.create ~name:"Part 2" exec_part_two;
       ]
       |> Bench.make_command
       |> Command.run
