@@ -2,24 +2,18 @@ open Core
 open Core_bench
 open Stdio
 
-let box_value id =
-  let init = Map.empty (module Char) in
-  let counts =
-    String.fold id ~init ~f:(fun counts key ->
-        Map.update counts key ~f:(fun v -> 1 + Option.value ~default:0 v)
-      )
-    |> Map.data
-  in
-  let has_count n = Bool.to_int (List.exists ~f:((=) n) counts) in
-  ( has_count 2, has_count 3 )
 
-let part_one input =
-  let (twos,threes) =
-    List.fold input ~init:(0,0) ~f:(fun (twos,threes) box_id ->
-        let (twos',threes') = box_value box_id in
-        (twos + twos', threes + threes')
-      )
-  in twos * threes
+(* -- HELPERS --------------------------------------------------------------- *)
+
+
+let box_value box =
+  let has_count n counts = Bool.to_int (List.exists ~f:((=) n) counts) in
+  let counts = Hashtbl.create (module Char) ~size:(String.length box) in
+  String.iter box ~f:(fun k ->
+      Hashtbl.update counts k ~f:(fun v -> 1 + Option.value ~default:0 v)
+    );
+  let counts = Hashtbl.data counts in
+  ( has_count 2 counts, has_count 3 counts )
 
 let eql_but_one s1 s2 =
   let char_lists = List.zip_exn s1 s2 in
@@ -40,6 +34,15 @@ let keep_shared_chars s1 s2 =
     )
   |> String.of_char_list
 
+
+(* -- AOC 2018 DAY 2 -------------------------------------------------------- *)
+
+
+let part_one input =
+  let box_sum (x,y) (x',y') = (x + x', y + y') in
+  List.fold input ~init:(0,0) ~f:(fun acc box -> box_sum acc (box_value box))
+  |> (fun (twos, threes) -> twos * threes)
+
 let part_two input =
   let input = List.map ~f:String.to_list input in
   List.fold_until input ~init:(List.tl input) ~finish:(Fn.const "")
@@ -51,7 +54,6 @@ let part_two input =
          | None -> Continue (List.tl tl)
          | Some x -> Stop (keep_shared_chars hd x)
     )
-
 
 let () =
   In_channel.with_file "input.txt" ~f:(fun inc ->
