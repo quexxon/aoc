@@ -1,38 +1,30 @@
 open Core
+open Core_bench
 open Stdio
 
-module IntPair = struct
-  include Tuple.Make (Int) (Int)
-  include Tuple.Hashable (Int) (Int)
-end
+let part_one fabric = Fabric.count_occupants fabric ~f:(( < ) 1)
 
-module Claim = struct
-  exception Invalid_claim of string
-
-  type t =
-    { id : int
-    ; pos : IntPair.t
-    ; size : IntPair.t }
-
-  let parse s =
-    let open Option.Monad_infix in
-    let re = Re.Perl.compile_pat {|^#(\d+) @ (\d+),(\d+): (\d+)x(\d+)$|} in
-    Option.try_with (fun () -> Re.exec re s) >>= fun grp ->
-    let get_as_int grp i = Re.Group.get grp i |> Int.of_string in
-    Some
-      { id = get_as_int grp 1
-      ; pos = (get_as_int grp 2, get_as_int grp 3)
-      ; size = (get_as_int grp 4, get_as_int grp 5) }
-end
-
-let part_one (claims : Claim.t list) =
-  let set = Hash_set.create (module IntPair) () in
-  List.iter claims ~f:(fun {pos; _} -> Hash_set.add set pos)
+let part_two fabric =
+  let single_occupant point = Some 1 = Fabric.occupants_at fabric point in
+  match Fabric.find_claim fabric ~f:(Claim.for_all ~f:single_occupant) with
+  | None -> raise (Not_found_s (String.sexp_of_t "No Match"))
+  | Some claim -> Claim.id claim
 
 let () =
   In_channel.with_file "input.txt" ~f:(fun inc ->
       let lines = In_channel.input_lines inc in
-      let claims =
+      let exec_setup () =
         List.map lines ~f:(fun line -> Option.value_exn (Claim.parse line))
+        |> Fabric.make
       in
-      part_one claims ; () )
+      let fabric = exec_setup () in
+      let exec_part_one () = part_one fabric in
+      let exec_part_two () = part_two fabric in
+      print_endline "RESULTS:" ;
+      printf "Part 1: %d\n" (exec_part_one ()) ;
+      printf "Part 2: %d\n" (exec_part_two ()) ;
+      print_endline "\nBENCHMARKS" ;
+      [ Bench.Test.create ~name:"Setup" exec_setup
+      ; Bench.Test.create ~name:"Part 1" exec_part_one
+      ; Bench.Test.create ~name:"Part 2" exec_part_two ]
+      |> Bench.make_command |> Command.run )
