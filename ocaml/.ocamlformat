@@ -1,1 +1,5 @@
 break-cases = fit
+break-infix-before-func = false
+field-space = loose
+parens-tuple-patterns = always
+type-decl = sparse
