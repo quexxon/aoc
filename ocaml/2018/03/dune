@@ -1,4 +1,7 @@
 (executable
  (name main)
+ (ocamlopt_flags
+  (:standard -O3))
  (libraries core core_bench stdio re)
- (preprocess (pps ppx_jane)))
+ (preprocess
+  (pps ppx_jane)))
