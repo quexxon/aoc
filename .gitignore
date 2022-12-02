@@ -1,3 +1,5 @@
 compiled/
 build/
 *~
+.lsp
+.clj-kondo
