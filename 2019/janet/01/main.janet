@@ -1,4 +1,4 @@
-(import "../../util" :as util)
+(import "../util" :as util)
 
 (defn- mass->fuel [mass]
   (- (math/floor (/ mass 3)) 2))
@@ -12,7 +12,7 @@
    0 module))
 
 (defn main [& args]
-  (let [modules (->> (util/read-input "./input.txt")
+  (let [modules (->> (util/read-input "../../input/01.txt")
                      (map scan-number))]
     (printf "Part 1: %d\n" (+ ;(map mass->fuel modules)))
     (printf "Part 2: %d\n" (+ ;(map fuel-requirement modules)))))
