@@ -1,11 +1,11 @@
 -module(util).
--export([exec/3, stopwatch/1]).
+-export([chunk/2, exec/3, stopwatch/1]).
 
 stopwatch(Thunk) ->
-    Start = erlang:monotonic_time(millisecond),
+    Start = erlang:monotonic_time(microsecond),
     Result = Thunk(),
-    End = erlang:monotonic_time(millisecond),
-    {Result, End - Start}.
+    End = erlang:monotonic_time(microsecond),
+    {Result, (End - Start) / 1000}.
 
 exec(Input, Part1, Part2) -> 
     {ok, Binary} = file:read_file(Input),
@@ -13,3 +13,13 @@ exec(Input, Part1, Part2) ->
     {P2, P2Time} = stopwatch(fun() -> Part2(Binary) end),
     io:fwrite("Part 1: ~w,\tElapsed: ~w ms~n", [P1, P1Time]),
     io:fwrite("Part 2: ~w,\tElapsed: ~w ms~n", [P2, P2Time]).
+
+chunk(N, List) ->
+    chunk(List, [], [], N, N).
+
+chunk([], Chunk, Acc, _, _) ->
+    lists:reverse([lists:reverse(Chunk) | Acc]);
+chunk(List, Chunk, Acc, Size, 0) ->
+    chunk(List, [], [lists:reverse(Chunk) | Acc], Size, Size);
+chunk([H|T], Chunk, Acc, Size, N) ->
+    chunk(T, [H|Chunk], Acc, Size, N - 1).
