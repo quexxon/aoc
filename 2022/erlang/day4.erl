@@ -11,7 +11,7 @@ parse_input(Input) ->
             [First, Last] = string:split(Section, "-"),
             {Start, _} = string:to_integer(First),
             {End, _} = string:to_integer(Last),
-            sets:from_list(lists:seq(Start, End))
+            sets:from_list(lists:seq(Start, End),  [{version, 2}])
         end, string:split(Line, ","))
     end, Lines).
 
