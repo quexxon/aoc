@@ -2,8 +2,7 @@
 -export([main/1]).
 
 main([Input]) ->
-    util:exec(Input, fun part1/1, fun part2/1),
-    init:stop().
+    util:exec(Input, fun part1/1, fun part2/1).
 
 parse_input(Input) ->
     lists:map(
