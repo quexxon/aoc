@@ -6,34 +6,37 @@ main([Input]) ->
 
 parse_input(Input) ->
     Lines = string:split(string:trim(Input), "\n", all),
-    lists:map(fun(Line) -> string:lexemes(Line, " ") end, Lines).
+    lists:map(fun(Line) ->
+        [X, Y] = string:lexemes(Line, " "),
+        {X, Y}
+    end, Lines).
 
-calculate_score([Opponent, Player]) ->
-    case [Opponent, Player] of
-        [<<"A">>, <<"X">>] -> 4;
-        [<<"A">>, <<"Y">>] -> 8;
-        [<<"A">>, <<"Z">>] -> 3;
-        [<<"B">>, <<"X">>] -> 1;
-        [<<"B">>, <<"Y">>] -> 5;
-        [<<"B">>, <<"Z">>] -> 9;
-        [<<"C">>, <<"X">>] -> 7;
-        [<<"C">>, <<"Y">>] -> 2;
-        [<<"C">>, <<"Z">>] -> 6;
-        _ -> throw([no_match, [Opponent, Player]])
+calculate_score({_Opponent, _Player}=Entry) ->
+    case Entry of
+        {<<"A">>, <<"X">>} -> 4;
+        {<<"A">>, <<"Y">>} -> 8;
+        {<<"A">>, <<"Z">>} -> 3;
+        {<<"B">>, <<"X">>} -> 1;
+        {<<"B">>, <<"Y">>} -> 5;
+        {<<"B">>, <<"Z">>} -> 9;
+        {<<"C">>, <<"X">>} -> 7;
+        {<<"C">>, <<"Y">>} -> 2;
+        {<<"C">>, <<"Z">>} -> 6;
+        _ -> throw({no_match, Entry})
     end.
 
-determine_move([Opponent, Outcome]) ->
-    case [Opponent, Outcome] of
-        [<<"A">>, <<"X">>] -> <<"Z">>;
-        [<<"A">>, <<"Y">>] -> <<"X">>;
-        [<<"A">>, <<"Z">>] -> <<"Y">>;
-        [<<"B">>, <<"X">>] -> <<"X">>;
-        [<<"B">>, <<"Y">>] -> <<"Y">>;
-        [<<"B">>, <<"Z">>] -> <<"Z">>;
-        [<<"C">>, <<"X">>] -> <<"Y">>;
-        [<<"C">>, <<"Y">>] -> <<"Z">>;
-        [<<"C">>, <<"Z">>] -> <<"X">>;
-        _ -> throw([no_match, [Opponent, Outcome]])
+determine_move({_Opponent, _Outcome}=Entry) ->
+    case Entry of
+        {<<"A">>, <<"X">>} -> <<"Z">>;
+        {<<"A">>, <<"Y">>} -> <<"X">>;
+        {<<"A">>, <<"Z">>} -> <<"Y">>;
+        {<<"B">>, <<"X">>} -> <<"X">>;
+        {<<"B">>, <<"Y">>} -> <<"Y">>;
+        {<<"B">>, <<"Z">>} -> <<"Z">>;
+        {<<"C">>, <<"X">>} -> <<"Y">>;
+        {<<"C">>, <<"Y">>} -> <<"Z">>;
+        {<<"C">>, <<"Z">>} -> <<"X">>;
+        _ -> throw({no_match, Entry})
     end.
 
 part1(Input) ->
@@ -45,8 +48,8 @@ part2(Input) ->
     Rounds = parse_input(Input),
     Scores = lists:map(
         fun (Round) ->
-            [Opponent, _] = Round,
-            calculate_score([Opponent, determine_move(Round)])
+            {Opponent, _} = Round,
+            calculate_score({Opponent, determine_move(Round)})
         end,
         Rounds
     ),

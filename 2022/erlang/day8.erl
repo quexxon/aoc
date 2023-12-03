@@ -40,30 +40,29 @@ is_visible({X,Y}=Point, Height, Grid, Is_Edge, Next_Point) ->
         false -> false
     end.
 
-
+viewing_distance({0,_},_,_) -> 0;
+viewing_distance({_,0},_,_) -> 0;
+viewing_distance({X,_},{XMax,_},_) when X =:= XMax -> 0;
+viewing_distance({_,Y},{_,YMax},_) when Y =:= YMax -> 0;
 viewing_distance({OriginX,OriginY}, {XMax,YMax}, Grid) ->
-    case OriginX =:= 0 orelse OriginY =:= 0 orelse OriginX =:= XMax orelse OriginY =:= YMax of
-        true -> 0;
-        false ->
-            Height = array:get(OriginX, array:get(OriginY, Grid)),
-            viewing_distance(
-                0, {OriginX,OriginY-1}, Height, Grid,
-                fun({_,Y}) -> Y =:= 0 end,
-                fun({X, Y}) -> {X,Y-1} end
-            ) * viewing_distance(
-                0, {OriginX+1,OriginY}, Height, Grid,
-                fun({X,_}) -> X =:= XMax end, 
-                fun({X, Y}) -> {X+1,Y} end
-            ) * viewing_distance(
-                0, {OriginX, OriginY+1}, Height, Grid, 
-                fun({_,Y}) -> Y =:= YMax end, 
-                fun({X, Y}) -> {X,Y+1} end
-            ) * viewing_distance(
-                0, {OriginX-1, OriginY}, Height, Grid, 
-                fun({X,_}) -> X =:= 0 end, 
-                fun({X, Y}) -> {X-1,Y} end
-            )
-    end.
+    Height = array:get(OriginX, array:get(OriginY, Grid)),
+    viewing_distance(
+        0, {OriginX,OriginY-1}, Height, Grid,
+        fun({_,Y}) -> Y =:= 0 end,
+        fun({X, Y}) -> {X,Y-1} end
+    ) * viewing_distance(
+        0, {OriginX+1,OriginY}, Height, Grid,
+        fun({X,_}) -> X =:= XMax end, 
+        fun({X, Y}) -> {X+1,Y} end
+    ) * viewing_distance(
+        0, {OriginX, OriginY+1}, Height, Grid, 
+        fun({_,Y}) -> Y =:= YMax end, 
+        fun({X, Y}) -> {X,Y+1} end
+    ) * viewing_distance(
+        0, {OriginX-1, OriginY}, Height, Grid, 
+        fun({X,_}) -> X =:= 0 end, 
+        fun({X, Y}) -> {X-1,Y} end
+    ).
 
 viewing_distance(Count, {X,Y}=Point, Height, Grid, Is_Edge, Next_Point) ->
     case array:get(X, array:get(Y, Grid)) < Height of

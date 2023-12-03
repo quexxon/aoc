@@ -9,8 +9,8 @@ parse_input(Input) ->
     lists:map(fun(Line) ->
         lists:map(fun(Section) ->
             [First, Last] = string:split(Section, "-"),
-            {Start, _} = string:to_integer(First),
-            {End, _} = string:to_integer(Last),
+            {Start, []} = string:to_integer(First),
+            {End, []} = string:to_integer(Last),
             sets:from_list(lists:seq(Start, End),  [{version, 2}])
         end, string:split(Line, ","))
     end, Lines).

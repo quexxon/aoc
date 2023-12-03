@@ -54,7 +54,7 @@ part1(Input) ->
     Tree = parse_input(Input),
     {_, DirectorySizes} = get_directory_sizes("/", maps:new(), Tree),
     MaxSize = 100000,
-    lists:foldr(fun(Size, Sum) ->
+    lists:foldl(fun(Size, Sum) ->
         if
             Size > MaxSize -> Sum;
             Size =< MaxSize -> Sum + Size

@@ -8,7 +8,7 @@ parse_input(Input) ->
     lists:map(
         fun(Group) ->
             lists:sum(lists:map(
-                fun(S) -> {N, _} = string:to_integer(S), N end,
+                fun(S) -> {N, []} = string:to_integer(S), N end,
                 string:lexemes(Group, "\n")
             ))
         end,

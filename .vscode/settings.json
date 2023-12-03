@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
         "andalso",
-        "orelse"
+        "foldl",
+        "fwrite",
+        "orelse",
+        "sublist"
     ]
 }
