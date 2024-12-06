@@ -1,0 +1,47 @@
+#!/usr/bin/env ysh
+
+use $LIB_YSH/math.ysh --pick abs
+
+proc parse-input(; llist, rlist) {
+	var left = []
+	var right = []
+	for line in (io.stdin) {
+		var m = line => search(/<capture d+> space+ <capture d+>/)
+		call left->append(m => group(1))
+		call right->append(m => group(2))
+	}
+	call llist->setValue(left)
+	call rlist->setValue(right)
+}
+
+proc part1() {
+	var llist = $(sort -n <<< $[llist => join(u'\n')]) => split(u'\n')
+	var rlist = $(sort -n <<< $[rlist => join(u'\n')]) => split(u'\n')
+
+	var sum = 0
+	for i, lval in (llist) {
+		var lval = int(lval)
+		var rval = int(rlist[i])
+		setvar sum += abs(lval - rval)
+	}
+
+	echo "Part 1: $sum"
+}
+
+proc part2() {
+	var rcount = {}
+	for val in (rlist) {
+		setvar rcount[val] = get(rcount, val, 0) + 1
+	}
+
+	var sum = 0
+	for val in (llist) {
+		setvar sum += int(val) * get(rcount, val, 0)
+	}
+
+	echo "Part 2: $sum"
+}
+
+parse-input (&llist, &rlist)
+part1
+part2
