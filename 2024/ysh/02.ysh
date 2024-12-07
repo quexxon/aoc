@@ -1,0 +1,63 @@
+#!/usr/bin/env ysh
+
+use $LIB_YSH/math.ysh --pick abs
+
+proc parse-input (; input) {
+	var out = []
+	for line in (io.stdin) {
+		var report = line.split(' ')
+		for i, val in (report) {
+			setvar report[i] = int(val)
+		}
+		call out->append(report)
+	}
+	call input->setValue(out)
+}
+
+func isSafe (report) {
+	var prev = report[0]
+	var asc = report[1] > prev
+	for i, n in (report[1:]) {
+		if (n < prev if asc else n > prev) {
+			return (false)
+		}
+		if (n === prev or abs(n - prev) > 3) {
+			return (false)
+		}
+		setvar prev = n
+	}
+	return (true)
+}
+
+proc part1 () {
+	var sum = 0
+	for report in (input) {
+		if (isSafe(report)) {
+			setvar sum += 1
+		}
+	}
+	echo "Part 1: $sum"
+}
+
+proc part2 () {
+	var sum = 0
+	for report in (input) {
+		if (isSafe(report)) {
+			setvar sum += 1
+			continue
+		}
+
+		for i, _ in (report) {
+			if (isSafe(report[:i] ++ report[i+1:])) {
+				setvar sum += 1
+				break
+			}
+		}
+	}
+	echo "Part 2: $sum"
+}
+
+echo "Parsing Input"
+time parse-input (&input)
+time part1
+time part2
