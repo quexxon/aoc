@@ -1,0 +1,53 @@
+#!/usr/bin/env ysh
+
+func searchAll (string, pattern; pos=0) {
+	var matches = []
+	while (true) {
+		var match = string.search(pattern, pos=pos)
+		if (not match) { break }
+		call matches->append(match)
+		setvar pos = match.end(0)
+	}
+	return (matches)
+}
+
+var Do = / 'do()' /
+var Dont = / 'don' \' 't()' /
+var Uint = / <capture d{1,3} : int> /
+var Mul = / 'mul(' Uint ',' Uint ')' /
+var Expr = / Do | Dont | Mul /
+
+func evalMul(expr) {
+	return (expr.group(1) * expr.group(2))
+}
+
+proc part1 (input) {
+	var expressions = input => searchAll(Mul)
+	var sum = 0
+	for expr in (expressions) {
+		setvar sum += evalMul(expr)
+	}
+	echo "Part 1: $sum"
+}
+
+proc part2 (input) {
+	var expressions = input => searchAll(Expr)
+	var mulEnabled = true
+	var sum = 0
+	for expr in (expressions) {
+		case (expr.group(0)) {
+			/ Do / { setvar mulEnabled = true }
+			/ Dont / { setvar mulEnabled = false }
+			/ Mul / {
+				if (mulEnabled) {
+					setvar sum += evalMul(expr)
+				}
+			}
+		}
+	}
+	echo "Part 2: $sum"
+}
+
+read --all (&input)
+part1 $input
+part2 $input
