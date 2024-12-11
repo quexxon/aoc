@@ -1,0 +1,104 @@
+#!/usr/bin/env ysh
+
+proc read-lines (; out) {
+	read --all
+	call out->setValue(_reply.trimEnd().split(u'\n'))
+}
+
+const N  = { x:  0, y: -1 }
+const NE = { x:  1, y: -1 }
+const E  = { x:  1, y:  0 }
+const SE = { x:  1, y:  1 }
+const S  = { x:  0, y:  1 }
+const SW = { x: -1, y:  1 }
+const W  = { x: -1, y:  0 }
+const NW = { x: -1, y: -1 }
+const DELTAS = [N, NE, E, SE, S, SW, W, NW]
+const XMAS = 'XMAS'
+
+func isMas (p1, p2, p3) {
+	return (p1 === 'M' and p2 === 'A' and p3 === 'S')
+}
+func isSam (p1, p2, p3) {
+	return (p1 === 'S' and p2 === 'A' and p3 === 'M')
+}
+
+proc part1 (; input) {
+	func count (x, y) {
+		var minX = 0
+		var minY = 0
+		var maxX = len(input[0]) - 1
+		var maxY = len(input) - 1
+		var sum = 0
+		for delta in (DELTAS) {
+			var pos = {x, y}
+			var matched = ['X']
+			var i = 1
+			while (i < len(XMAS)) {
+				setvar pos.x += delta.x
+				setvar pos.y +=  delta.y
+				if (pos.x < minX or pos.x > maxX or pos.y < minY or pos.y > maxY) {
+					break
+				}
+				if (input[pos.y][pos.x] !== XMAS[i]) {
+					break
+				}
+				call matched->append(XMAS[i])
+				if (i + 1 === len(XMAS)) {
+					setvar sum += 1
+				}
+				setvar i += 1
+			}
+		}
+		return (sum)
+	}
+	var sum = 0
+	for y, line in (input) {
+		for x in (0..<len(line)) {
+			var chr = line[x]
+			if (chr === XMAS[0]) {
+				setvar sum += count(x, y)
+			}
+		}
+	}
+	echo "Part 1: $sum"
+}
+
+proc part2 (; input) {
+	func isMatch (x, y) {
+		var minX = 0
+		var minY = 0
+		var maxX = len(input[0]) - 1
+		var maxY = len(input) - 1
+		if (x === minX or x === maxX or y === minY or y === maxY) {
+			return (false)
+		}
+		var asc = [
+			input[y + SW.y][x + SW.x],
+			input[y][x],
+			input[y + NE.y][x + NE.x],
+		]
+		var desc = [
+			input[y + NW.y][x + NW.x],
+			input[y][x],
+			input[y + SE.y][x + SE.x],
+		]
+		return (
+			(isMas(...asc) or isSam(...asc)) and
+			(isMas(...desc) or isSam(...desc))
+		)
+	}
+	var sum = 0
+	for y, line in (input) {
+		for x in (0..<len(line)) {
+			if (isMatch(x, y)) {
+				setvar sum += 1
+			}
+		}
+	}
+	echo "Part 2: $sum"
+}
+
+read-lines (&input)
+part1 (input)
+part2 (input)
